@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html id="html" class = "w-screen h-screen p-0 overflow-hidden touch-none" data-theme="">
+    <head>
+        <title>Ghid în Gorj</title>
+        <link rel="icon" type="image/x-icon" href="favicon.ico">        
+        <meta name="description" content="Explorează Ghid în Gorj, resursa ta pentru a descoperi cele mai bune trasee, centre culturale și atracții din Gorj."/>
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0 minimum-scale=1.0" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="./css/bundle.css">
+        <script src="src/loading.js"></script>
+        <script src="./flyonui/flyonui.js"></script>
+    </head>
+
+    <body class = "w-screen h-screen p-0 overflow-hidden bg-base-100"></body>
+
+        
+        <!-- curtains -->
+        <div id="loading" class = "absolute z-50 w-screen h-screen bg-base-100"></div>
+        <div id="githubCurtain" class = "w-screen h-[150vh] top-[-150vh] bg-base-100 z-50 absolute"></div>
+        
+        <!-- navbar -->
+        <div id="navbar" class="relative z-40 pointer-events-none flex w-screen h-20 bg-[#00ffff00] md:h-16 lg:h-20 xl:h-20 2xl:h-24">
+            <img id="navbarLogo" class="h-20 p-2 md:h-16 md:p-2 lg:h-20 xl:h-20 xl:p-3 2xl:h-24 " src="./assets/ghidingorjlogo.png" alt="logo">
+            <div id="navbarTitle" class="flex items-center h-20 p-2 font-sans text-2xl font-bold text-primary-content drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] sm:text-3xl md:text-4xl xl:text-5xl md:h-16 lg:h-20 xl:h-20 2xl:h-24 " id="title">Ghid în Gorj</div>
+            
+            <div class="h-20 p-4 sm:p-4 md:h-16 md:p-3 lg:h-20 lg:p-4 xl:h-20 xl:p-[0.80rem] 2xl:h-24 2xl:p-5 absolute right-0 z-40 pointer-events-auto">
+                <ul class="flex">
+                    <li class="hidden duration-300 rounded-full cursor-pointer sm:ml-3 md:flex lg:ml-4 sm:hover:bg-primary" href="#"><img class="p-1 md:w-[2.5rem] lg:w-[3rem] xl:w-[3.5rem]" draggable="false" id="maximize" src="./assets/icons/maximize.png" alt = "fullscreen"></li>
+                    <li class="hidden duration-300 rounded-full cursor-pointer sm:ml-3 sm:flex lg:ml-4 sm:hover:bg-primary" href="#"><img class=" sm:w-[3rem] md:w-[2.5rem] lg:w-[3rem] xl:w-[3.5rem]" draggable="false" id="github" src="./assets/icons/github.png" alt = "github"></li>
+                    <li class="ml-0 duration-300 rounded-full cursor-pointer sm:ml-3 lg:ml-4 sm:hover:bg-primary" href="#"><img class="w-[3rem] md:w-[2.5rem] lg:w-[3rem] xl:w-[3.5rem]" draggable="false" id="settings" src="./assets/icons/settings.png" alt = "settings"></li>
+                </ul>
+            </div>
+        </div>
+    
+        <div class="absolute top-0 left-0 z-0 w-screen h-screen" tabindex="-1" id="map"></div>
+      
+        <!-- sidebar -->
+        <div class="absolute left-0 top-[23vh] flex flex-col">
+            <div  id = "openRoute" class="w-16 h-16 rounded-b-none rounded-br-none sm:w-56 sm:h-20 opacity-90 bg-base-100 rounded-tr-2xl " >
+                <div id="openRouteBttn" class = "flex flex-row items-center justify-start text-2xl duration-150 hover:scale-110 active:scale-90 ">
+                    <img src="assets/icons/route.png"  class="p-4 opacity-90  w-[64px] h-[64px] sm:w-[80px] sm:h-[80px]" alt = "trails">
+                    <b class="hidden sm:block"><span class="RO">Trasee</span><span class="EN">Trails</span><span class="FR">Sentiers</span></b>
+                </div>
+                <div id = "routeSelector" class="z-40 hidden relative top-[-64px] sm:top-[-80px] overflow-scroll bg-base-100 scale-100 scrollbar-none rounded-2xl w-[19rem] h-[23rem] sm:w-80 sm:h-96">
+                    <div class="sticky top-0 z-30 flex items-center justify-between bg-base-100">
+                        <div id = "title" class="p-3 ml-2 font-sans text-2xl text-left text-base-content"><b><span class="RO">Trasee</span><span class="EN">Trails</span><span class="FR">Sentiers</span></b></div>  
+                        <img src="assets/icons/close.png" alt="close" id="closeRouteBttn" class="p-4 duration-150 opacity-40  hover:scale-110 active:scale-90 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] ">
+                    </div>
+                    <ul id = "routeList" class="w-[90%] flex relative flex-col bg-base-300 rounded-3xl mx-[5%]">  </ul>
+                    <div class="relative bottom-0 mt-4"></div>
+                </div>
+            </div>
+            
+            <div id="openGuide" class="flex w-16 h-16 rounded-tr-none sm:w-56 sm:h-20 opacity-90 bg-base-100 top-100 ">
+                <div id="openGuideBttn" class = "flex flex-row items-center justify-center text-2xl duration-150 hover:scale-110 active:scale-90 ">
+                    <img src="assets/icons/guide.png"  class="p-4 opacity-90  w-[64px] h-[64px] sm:w-[80px] sm:h-[80px]" alt = "contact">
+                    <b class="hidden sm:block"><span class="RO">Ghizi</span><span class="EN">Guides</span><span class="FR">Guides</span></b>
+                </div>
+                
+            </div> 
+            <div id="openEvents" class="flex w-16 h-16 rounded-tr-none sm:w-56 sm:h-20 opacity-90 bg-base-100 top-100 ">
+                <div id="openEventsBttn" class = "flex flex-row items-center justify-center text-2xl duration-150 hover:scale-110 active:scale-90">
+                    <img src="assets/icons/events.png"  class="p-4 opacity-90 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px]" alt = "contact">
+                    <b class="hidden sm:block"><span class="RO">Evenimente</span><span class="EN">Events</span><span class="FR">Événements</span></b>    
+                </div>
+
+                <div id = "eventSelector" class="z-40 hidden overflow-scroll bg-base-100 scale-100 scrollbar-none rounded-2xl w-[19rem] h-[23rem] sm:w-80 sm:h-96">
+                    <div class="sticky top-0 z-30 flex items-center justify-between bg-base-100">
+                        <div id = "title" class="p-3 ml-2 font-sans text-2xl text-left text-base-content"><b><span class="RO">Evenimente</span><span class="EN">Events</span><span class="FR">Événements</span></b>  </div>  
+                        <img src="assets/icons/close.png" alt="close" id="closeEventsBttn" class="p-4 duration-150 opacity-40  hover:scale-110 active:scale-90 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] ">
+                    </div>
+                    <ul id = "eventList" class="w-[90%] flex relative flex-col bg-base-300 rounded-3xl mx-[5%]">  </ul>
+                    <div class="relative bottom-0 mt-4"></div>
+                </div>
+            </div>  
+            <div id="openErasmus" class="flex w-16 h-16 rounded-tr-none sm:w-56 sm:h-20 opacity-90 bg-base-100 top-100 rounded-br-2xl ">
+                <div id="openErasmusBttn" class = "flex flex-row items-center justify-center text-2xl duration-150 hover:scale-110 active:scale-90">
+                    <img src="assets/icons/erasmus.png"  class="p-4 opacity-90 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px]" alt = "contact">
+                    <b class="hidden sm:block"><span class="RO">Erasmus+</span><span class="EN">Erasmus+</span><span class="FR">Erasmus+</span></b>
+                </div>
+
+                <div id = "erasmusSelector" class="z-40 hidden overflow-scroll bg-base-100 scale-100 scrollbar-none rounded-2xl w-[19rem] h-[23rem] sm:w-80 sm:h-80">
+                    <div class="sticky top-0 z-30 flex items-center justify-between bg-base-100">
+                        <div id = "title" class="p-3 ml-2 font-sans text-2xl text-left text-base-content"><b><span class="RO">Erasmus+</span><span class="EN">Erasmus+</span><span class="FR">Erasmus+</span></b>  </div>  
+                        <img src="assets/icons/close.png" alt="close" id="closeErasmusBttn" class="p-4 duration-150 opacity-40  hover:scale-110 active:scale-90 w-[64px] h-[64px] sm:w-[80px] sm:h-[80px] ">
+                    </div>
+                    <ul id = "routeList" class="w-[90%] flex relative flex-col bg-base-300 rounded-3xl mx-[5%]">  
+                        <li class="flex items-center justify-between p-3">
+                            <div class="ml-2 font-sans text-xl text-neutral text-balance"><span class="RO">Pădurea Erasmus+ Runcu</span><span class="EN">Erasmus+ Forest Runcu</span><span class="FR">Forêt Erasmus+ Runcu</span></div>     
+                            <button id="erasmus1" type="button" class="rounded-full btn btn-primary">Show</button>
+                        </li>
+                        <li class="flex items-center justify-between p-3">
+                            <div class="ml-2 font-sans text-xl text-neutral text-balance"><span class="RO">Pădurea Erasmus+ Baia de Fier</span><span class="EN">Erasmus+ Forest Baia de Fier</span><span class="FR">Forêt Erasmus+ Baia de Fier</span></div>     
+                            <button id="erasmus2" type="button" class="rounded-full btn btn-primary">Show</button>
+                        </li>
+                        <li class="flex items-center justify-between p-3">
+                            <div class="ml-2 font-sans text-xl text-neutral text-balance"><span class="RO">Pădurea Erasmus+ Defileul Jiului</span><span class="EN">Erasmus+ Forest Jiului Gorge</span><span class="FR">Forêt Erasmus+ Gorges du Jiu</span></div>     
+                            <button id="erasmus3" type="button" class="rounded-full btn btn-primary">Show</button>
+                        </li>
+                 
+                    </ul>
+                </div>
+                
+            </div> 
+        </div>
+            
+        <!-- open in maps button -->
+        <div id="openInMaps" class="sm:flex  absolute text-xl md:text-2xl w-fit items-center text-base-content bottom-10 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] left-[-400px] hover:scale-110 active:scale-100 duration-300 active:duration-100 select-none">
+            <img src="assets/icons/maps.png" alt="" class="mr-2 w-[40px] h-[40px] md:w-[64px] md:h-[64px] inline-block align-middle" alt = "open in maps"> <span class="inline-block align-middle text-primary-content"><span class="RO">Deschide în GoogleMaps!</span><span class="EN">Open in GoogleMaps!</span><span class="FR">Ouvrir dans GoogleMaps!</span>
+        </div>
+
+
+        <!-- descriptor -->
+        <div id = "descriptor" class="z-30 bottom-[-100%] w-screen h-[100%] sm:h-screen sm:bottom-0 sm:w-[60vw] sm:right-[-60vw] absolute bg-base-100 overflow-hidden touch-none flex flex-col">
+            <div class="flex h-20 md:h-16 lg:h-20 xl:h-20 2xl:h-24"><div class="w-3 h-20 "></div><div class="w-fit ml-[1rem] cursor-pointer font-sans text-accent-content flex items-center"><img src="./assets/icons/back.png" alt="back"><span class="RO">Înapoi</span><span class="EN">Back</span><span class="FR">Dos</span><a id="descripitorBack" class="h-8 w-[5rem] absolute cursor-pointer z-40"></a></div></div>
+            <div id = content class="overflow-x-hidden overflow-y-scroll touch-pan-y scrollbar-thumb-white scrollbar scrollbar-w-1 scrollbar-thumb-rounded-full">
+                
+                 
+
+            </div> 
+        </div>
+
+
+        <!-- settings -->
+        <div class="bottom-[-60vh] w-screen h-[60vh] sm:h-screen sm:bottom-0 sm:w-[20rem] sm:right-[-20rem] md:w-[24rem] md:right-[-24rem] lg:w-[28rem] lg:right-[-28rem] xl:w-[28rem] xl:right-[-28rem] 2xl:w-[32rem] 2xl:right-[-32rem] absolute bg-base-100 z-10 flex flex-col overflow-hidden touch-none" id="settingsMenu">
+            <div class="flex h-20 md:h-16 lg:h-20 xl:h-20 2xl:h-24"><div class="w-3 h-20 "></div><div class="w-fit ml-[1rem] cursor-pointer font-sans text-accent-content flex items-center"><img src="./assets/icons/back.png" alt="back"><span class="RO">Înapoi</span><span class="EN">Back</span><span class="FR">Dos</span><a id="settingsBack" class="h-8 w-[5rem] absolute cursor-pointer z-40"></a></div></div>
+            <div id="mapSettings" class="flex flex-col gap-5 overflow-scroll overflow-x-hidden touch-pan-y scrollbar-thumb-white scrollbar scrollbar-w-1 scrollbar-thumb-rounded-full">
+                <div>
+                    <div class="p-2 ml-6 font-sans text-accent"><span class="RO">SETĂRI HARTĂ</span><span class="EN">MAP SETTINGS</span><span class="FR">PARAMÈTRES DE LA CARTE</span></div>
+                    <ul class="w-[90%] flex relative flex-col bg-base-200 rounded-3xl mx-[5%]">
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Arată Centre Culturale</span><span class="EN">Show Cultural Centers</span><span class="FR">Afficher les centres culturels</span></div>     
+                            <div class="absolute right-0 flex items-center gap-1 ">
+                                <input checked type="checkbox" class="switch switch-primary" id="showCulture" />
+                                <label class="text-base label label-text" for="showCulture">  </label>
+                              </div>
+                        </li>
+                       <li id="border" class="w-auto bg-base-300 h-[2px] mx-3 "> 
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Arată Natură</span><span class="EN">Show Landscape</span><span class="FR">Afficher le paysage</span></div>     
+                            <div class="absolute right-0 flex items-center gap-1 ">
+                                <input checked type="checkbox" class="switch switch-primary" id="showLandscape" />
+                                <label class="text-base label label-text" for="showLandscape">  </label>
+                              </div>
+                        </li>
+                       <li id="border" class="w-auto bg-base-300 h-[2px] mx-3 "> 
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Arată Industrie</span><span class="EN">Show Industry</span><span class="FR">Afficher l'industrie</span></div>     
+                            <div class="absolute right-0 flex items-center gap-1 ">
+                                <input checked type="checkbox" class="switch switch-primary" id="showIndustry" />
+                                <label class="text-base label label-text" for="showIndustry">  </label>
+                              </div>
+                        </li>
+                       <li id="border" class="w-auto bg-base-300 h-[2px] mx-3 "> 
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Arată Legende</span><span class="EN">Show Legends</span><span class="FR">Afficher les légendes</span></div>     
+                            <div class="absolute right-0 flex items-center gap-1 ">
+                                <input checked type="checkbox" class="switch switch-primary" id="showLegend" />
+                                <label class="text-base label label-text" for="showLegend">  </label>
+                              </div>
+                        </li>
+                        <li id="border" class="w-auto bg-base-300 h-[2px] mx-3 "> 
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Arată Evenimente</span><span class="EN">Show Events</span><span class="FR">Afficher les événements</span></div>     
+                            <div class="absolute right-0 flex items-center gap-1 ">
+                                <input checked type="checkbox" class="switch switch-primary" id="showEvent" />
+                                <label class="text-base label label-text" for="showEvent">  </label>
+                            </div>
+                        </li>
+                        <li id="border" class="w-auto bg-base-300 h-[2px] mx-3 "> 
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Arată Parcări</span><span class="EN">Show Parking</span><span class="FR">Afficher les parkings</span></div>     
+                            <div class="absolute right-0 flex items-center gap-1 ">
+                                <input unchecked disabled type="checkbox" class="switch switch-primary" id="showParking" />
+                                <label class="text-base label label-text" for="showParking">  </label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="accessibility" class="mt-4">
+                    <div class="p-2 ml-6 font-sans text-accent"><span class="RO">ACCESIBILITATE</span><span class="EN">ACCESSIBILITY</span><span class="FR">ACCESSIBILITÉ</span></div>
+                    <ul class="w-[90%] flex relative flex-col bg-base-200  rounded-3xl mx-[5%]">
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Animații Reduse</span><span class="EN">Reduce Motion</span><span class="FR">Réduire les animations</span></div>     
+                            <div class="absolute right-0 flex items-center gap-1 ">
+                                <input checked type="checkbox" class="switch-primary switch " id="reduceMotion" />
+                                <label class="text-base label label-text" for="reduceMotion">  </label>
+                              </div>
+                        </li>
+                        <li id="border" class="w-auto bg-base-300 h-[2px] mx-3 "> 
+                        <li class="flex items-center h-16 p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Limbă</span><span class="EN">Language</span><span class="FR">Langue</span></div>     
+                            <label for="language" class="absolute right-0 inline-flex items-center p-4 cursor-pointer">
+                                <select id="language" class="max-w-sm appearance-none w-28 select bg-base-200 text-base-content" aria-label="select">
+                                    <option  value="en">English</option>
+                                    <option value="ro">Română</option>
+                                    <option value="fr">Français</option>
+                                  </select>
+                            </label>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <div id="darkmode" class="">
+                    <div class="p-2 ml-6 font-sans text-accent"><span class="RO">TEMĂ</span><span class="EN">THEME</span><span class="FR">THÈME</span></div>
+                    <ul class="w-[90%] flex relative flex-col bg-base-200 rounded-3xl mx-[5%] mb-10">
+                        <li class="flex items-center p-3">
+                            <div class="ml-2 font-sans text-xl text-base-content "><span class="RO">Mod Întunecat</span><span class="EN">Dark Mode</span><span class="FR">Mode sombre</span></div>     
+                            <label class="absolute right-4 swap swap-rotate" for="darkMode">
+                                <input type="checkbox" id="darkMode"/>
+                                <span class="swap-on icon-[tabler--sun] size-6 bg-base-content"></span>
+                                <span class="swap-off icon-[tabler--moon] size-6 bg-base-content"></span>
+                              </label>
+                        </li>
+                    </ul>
+                </div>
+                
+         
+            
+            <footer class="flex flex-col items-center gap-4 p-6 footer mt-15 ">
+                <div class="flex items-center gap-2 text-xl font-bold">
+                    <img src="assets/ghidingorjlogo.png" alt="logo" class="w-6" />
+                  <span class="">Ghid în Gorj</span>
+                </div>
+                <aside>
+                  <p>©2025 Luca Zguroiu</p>
+                </aside>
+                <nav class="grid-flow-col gap-4 text-base-content">
+                  <a class="link link-animated " id="license">License</a>
+                  <a class="link link-animated " id="help">Thanks</a>
+                  <a class="link link-animated " id="contact">Contact</a>
+                </nav>
+                <div class="flex h-5 gap-4">
+                  <a href="https://github.com/luke333z/ghidingorj" class="link" aria-label="Github Link">
+                    <span class="icon-[tabler--brand-github] size-5 hover:scale-105 duration-150"></span>
+                  </a>
+                  <a href="https://cntv-edu.ro/" class="link" aria-label="Home Link">
+                    <span class="icon-[tabler--home] size-5 hover:scale-105 duration-150"></span>
+                  </a>
+                  <a href="https://www.instagram.com/ghidingorj/" class="link" aria-label="Instagram Link">
+                    <span class="icon-[tabler--brand-instagram] size-5 hover:scale-105 duration-150"></span>
+                  </a>
+                </div>
+
+
+                    <!-- Slider -->
+                    <div
+                    data-carousel='{
+                    "loadingClasses": "opacity-0",
+                    "dotsItemClasses": "carousel-box",
+                    "isAutoHeight": true
+                    }' class="relative w-full h-auto" id="settingsCarousel">
+                    <div class="carousel">
+                    <div class="rounded-none opacity-0 carousel-body">
+                        <div class="h-[300px] carousel-slide">
+                        <div class="flex flex-col items-center justify-center p-6 h-fit">
+                            <img src="assets/acreditare.png" alt="logo" class="mt-8 w-60" />
+                            <br>2020-1-RO01-KA120-SCH-095590 ACREDITARE
+                            <br>2023-1-RO01-KA121-SCH-000125624
+                        </div>
+                        </div>
+                        <div class="h-[50rem] carousel-slide">
+                        <div class="justify-center hidden p-6 overflow-visible rounded-none " id="licenseText">
+                            <div class="self-center overflow-visible text-lg sm:text-lg" >
+                            
+                                MIT License
+                                <br><br>
+                                Copyright (c) 2025 Luca-Mihai Zguroiu
+                                <br><br>
+                                Permission is hereby granted, free of charge, to any person obtaining a copy
+                                of this software and associated documentation files (the "Software"), to deal
+                                in the Software without restriction, including without limitation the rights
+                                to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                                copies of the Software, and to permit persons to whom the Software is
+                                furnished to do so, subject to the following conditions:
+                                <br><br>
+                                The above copyright notice and this permission notice shall be included in all
+                                copies or substantial portions of the Software.
+                                <br><br>
+                                THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                                IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                                FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                                AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+                                SOFTWARE.
+                            </div>
+                        </div>
+                        </div>
+                        <div class="carousel-slide">
+                        <div class="flex flex-col justify-center h-full p-6 ">
+                            <span><b>Our team</b>
+                                <br>
+                                <span>Luca-Mihai Zguroiu</span><br>
+                                <span>Alexandra Zamfir</span><br>
+                                <span>Vlad Popescu</span>
+
+                            </span><br><br>
+                            <span>Icons by  <a class="link-animated" href="https://icons8.com/">Icons8</a></span>
+                            <span>Photos by  <a class="link-animated" href="https://onlr2022gj.wordpress.com/galerie/">Daniel Murărița @ ContraPunct</a></span>        
+                           
+                            
+                                
+                        </div>
+                        </div>
+                        <div class="h-24 carousel-slide ">
+                        <div class="flex-col items-center justify-center p-6 h-fit">
+                            <div><b><span class="RO">Contactează-ne</span><span class="EN">Contact Us</span><span class="FR">Contactez-nous</span></b></div>
+                            <a class="link-animated" href="mailto:contact@ghidingorj.ro">contact@ghidingorj.ro</a>
+
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    <!-- End Slider -->
+
+
+              </footer>
+            </div>
+        </div>
+       
+       
+    </body>
+  
+</html>
